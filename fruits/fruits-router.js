@@ -1,14 +1,5 @@
 const express = require("express")
-const knex = require("knex")
-
-const db = knex({
-	client: "sqlite3",
-	useNullAsDefault: true,
-	connection: {
-		filename: "./data/produce.db3",
-	},
-})
-
+const db = require("../data/config")
 const router = express.Router()
 
 router.get("/", async (req, res, next) => {
@@ -34,6 +25,11 @@ router.get("/:id", async (req, res, next) => {
 
 router.post("/", async (req, res, next) => {
 	try {
+		if(!req.body.avgWeightOz) {
+			res.status(400).json({
+				message: "Missing a required parameter"
+			})
+		}
 		const fruitData = req.body
 		const [id] = await db("fruits").insert(fruitData)
 		const newFruit = await db("fruits").where({ id })
